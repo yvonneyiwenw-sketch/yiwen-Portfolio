@@ -2,72 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Wang Yiwen — Landscape Architecture Portfolio</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#3a3a3a;font-family:'Segoe UI',sans-serif}
+html,body{width:100%;height:100%;overflow:hidden;background:#2e2e2e;font-family:'Segoe UI',sans-serif}
 
 /* ── top bar ── */
-#topbar{position:fixed;top:0;left:0;width:100%;height:48px;background:rgba(15,15,15,.72);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08);display:none;align-items:center;justify-content:space-between;padding:0 20px;z-index:500}
-#topbar .ttl{color:#fff;font-size:.88rem;font-weight:600;opacity:.85}
-#topbar .pg {color:#fff;font-size:.78rem;opacity:.45}
+#topbar{position:fixed;top:0;left:0;width:100%;height:44px;background:rgba(10,10,10,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.08);display:none;align-items:center;justify-content:space-between;padding:0 16px;z-index:500}
+#topbar .ttl{color:#fff;font-size:.82rem;font-weight:600;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+#topbar .pg{color:#fff;font-size:.75rem;opacity:.45;flex-shrink:0}
 
 /* ── stage ── */
-#stage{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;padding-top:48px}
+#stage{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;padding-top:44px}
 
 /* ── book ── */
-#book{position:relative;display:flex;box-shadow:0 40px 80px rgba(0,0,0,.7)}
+#book{position:relative;display:flex;box-shadow:0 24px 64px rgba(0,0,0,.8)}
 
-/* static page halves */
+/* page halves */
 .pg-half{position:relative;overflow:hidden;background:#fff;flex-shrink:0}
 .pg-half.L{border-radius:3px 0 0 3px}
 .pg-half.R{border-radius:0 3px 3px 0}
-/* spine gradients */
-.pg-half.L::after {content:'';position:absolute;top:0;right:0;width:36px;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,.18));pointer-events:none;z-index:2}
-.pg-half.R::before{content:'';position:absolute;top:0;left:0; width:36px;height:100%;background:linear-gradient(to left, transparent,rgba(0,0,0,.18));pointer-events:none;z-index:2}
+.pg-half.L::after{content:'';position:absolute;top:0;right:0;width:32px;height:100%;background:linear-gradient(to right,transparent,rgba(0,0,0,.15));pointer-events:none;z-index:2}
+.pg-half.R::before{content:'';position:absolute;top:0;left:0;width:32px;height:100%;background:linear-gradient(to left,transparent,rgba(0,0,0,.15));pointer-events:none;z-index:2}
 
-/* ── flip container: sits exactly over right half ── */
-#flipper{position:absolute;top:0;right:0;pointer-events:none;overflow:hidden;z-index:10;display:none}
-
-/* the two sub-canvases inside #flipper:
-   #fc-front  — face of the turning page (seen before it passes 90°)
-   #fc-back   — back of the turning page (seen after 90°, mirror-flipped)
-   Both live inside a perspective wrapper */
-#flip-inner{position:absolute;top:0;left:0;width:100%;height:100%;transform-style:preserve-3d;perspective:1200px}
-#fc-front,#fc-back{position:absolute;top:0;left:0;backface-visibility:hidden;transform-origin:left center}
-#fc-back{transform:rotateY(180deg)} /* initially hidden — back face */
-
-/* page curl shadow overlay */
-#flip-shadow{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to right,rgba(0,0,0,.22),transparent 50%);pointer-events:none;opacity:0}
+/* ── slide overlay: covers the entire book during transition ── */
+#slide-over{
+  position:absolute;top:0;left:0;
+  pointer-events:none;
+  z-index:20;
+  overflow:hidden;
+  display:none;
+}
+#slide-over canvas{display:block}
+/* moving shadow edge */
+#slide-edge{
+  position:absolute;top:0;
+  width:28px;height:100%;
+  pointer-events:none;
+}
 
 /* ── controls ── */
-#ctrls{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:8px 18px;z-index:500}
-.cb{background:none;border:none;color:#fff;font-size:1.1rem;cursor:pointer;padding:3px 10px;border-radius:50px;transition:background .15s;line-height:1}
+#ctrls{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:none;align-items:center;gap:8px;background:rgba(0,0,0,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:7px 16px;z-index:500}
+.cb{background:none;border:none;color:#fff;font-size:1.05rem;cursor:pointer;padding:4px 10px;border-radius:50px;transition:background .15s;line-height:1;-webkit-tap-highlight-color:transparent}
 .cb:hover:not(:disabled){background:rgba(255,255,255,.14)}
-.cb:disabled{opacity:.28;cursor:default}
-#plbl{font-size:.8rem;color:#fff;opacity:.6;min-width:86px;text-align:center}
-.sep{width:1px;height:17px;background:rgba(255,255,255,.16)}
+.cb:disabled{opacity:.25;cursor:default}
+#plbl{font-size:.78rem;color:#fff;opacity:.6;min-width:80px;text-align:center}
+.sep{width:1px;height:16px;background:rgba(255,255,255,.16)}
 
 /* ── loading ── */
-#loading{position:fixed;inset:0;background:#222;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;text-align:center;padding:2rem}
-.spin{width:46px;height:46px;border:4px solid rgba(167,139,250,.2);border-top-color:#a78bfa;border-radius:50%;animation:spin .8s linear infinite}
+#loading{position:fixed;inset:0;background:#222;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+.spin{width:44px;height:44px;border:4px solid rgba(167,139,250,.2);border-top-color:#a78bfa;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#loading p{color:#fff;opacity:.55;font-size:.92rem;max-width:340px;line-height:1.5}
-.upbtn{display:inline-block;margin-top:.4rem;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;padding:.65rem 2rem;border-radius:50px;font-size:.95rem;font-weight:600;cursor:pointer}
+#loading p{color:#fff;opacity:.5;font-size:.9rem}
 
-@media(max-width:640px){.pg-half.R{display:none!important}.pg-half.L{border-radius:3px}}
+/* ── mobile: single page ── */
+@media(max-width:640px){
+  .pg-half.R{display:none!important}
+  .pg-half.L{border-radius:3px}
+  #stage{padding-top:44px}
+}
 </style>
 </head>
 <body>
 
-<!-- Loading / upload screen -->
-<div id="loading">
-  <div class="spin"></div>
-  <p>Loading portfolio…<br><span style="font-size:.8rem;opacity:.7">If it doesn't load automatically, select your PDF below.</span></p>
-  <label class="upbtn">Choose PDF <input id="fi" type="file" accept="application/pdf" style="display:none"></label>
-</div>
+<div id="loading"><div class="spin"></div><p>Loading portfolio…</p></div>
 
 <div id="topbar">
   <span class="ttl">Wang Yiwen — Landscape Architecture Portfolio</span>
@@ -78,14 +78,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#3a3a3a;font-family:
   <div id="book">
     <div class="pg-half L" id="hL"><canvas id="cL"></canvas></div>
     <div class="pg-half R" id="hR"><canvas id="cR"></canvas></div>
-
-    <!-- Flipper: absolutely positioned over the right (or left) half -->
-    <div id="flipper">
-      <div id="flip-inner">
-        <canvas id="fc-front"></canvas>
-        <canvas id="fc-back"></canvas>
-      </div>
-      <div id="flip-shadow"></div>
+    <!-- sliding page overlay -->
+    <div id="slide-over">
+      <canvas id="cSlide"></canvas>
+      <div id="slide-edge"></div>
     </div>
   </div>
 </div>
@@ -97,157 +93,155 @@ html,body{width:100%;height:100%;overflow:hidden;background:#3a3a3a;font-family:
   <button class="cb" id="bNext">▶</button>
   <button class="cb" id="bLast">⏭</button>
   <div class="sep"></div>
-  <button class="cb" id="bZo" style="font-size:.88rem">－</button>
-  <button class="cb" id="bZi" style="font-size:.88rem">＋</button>
+  <button class="cb" id="bZo" style="font-size:.84rem">－</button>
+  <button class="cb" id="bZi" style="font-size:.84rem">＋</button>
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// ── CONFIG: set your PDF path here for GitHub Pages ──
-const PDF_URL = 'portfolio.pdf'; // put your PDF in the same repo folder
+// ── CONFIG ─────────────────────────────────────────────────
+const PDF_URL = 'portfolio.pdf'; // must be in same GitHub repo folder
 
 // ── state ──────────────────────────────────────────────────
 let pdf=null,total=0,spread=1,scale=1,busy=false;
+const isMobile=()=>window.innerWidth<=640;
 
 const $=id=>document.getElementById(id);
 const loading=$('loading'),topbar=$('topbar'),ctrls=$('ctrls');
 const hL=$('hL'),hR=$('hR'),cL=$('cL'),cR=$('cR');
-const flipper=$('flipper'),flipInner=$('flip-inner');
-const fcFront=$('fc-front'),fcBack=$('fc-back');
-const flipShadow=$('flip-shadow');
+const slideOver=$('slide-over'),cSlide=$('cSlide'),slideEdge=$('slide-edge');
 
 // ── load PDF ───────────────────────────────────────────────
 async function loadPDF(src){
   try{
     pdf=await pdfjsLib.getDocument(src).promise;
     total=pdf.numPages;
-    const pg=await pdf.getPage(1);
-    const vp=pg.getViewport({scale:1});
-    const mw=(window.innerWidth*.88)/2, mh=window.innerHeight*.85;
-    scale=Math.min(mw/vp.width, mh/vp.height, 2);
+    await computeScale();
     loading.style.display='none';
     topbar.style.display='flex';
     ctrls.style.display='flex';
-    spread=1; await renderSpread(1,false);
+    spread=1;
+    await renderSpread(1,false);
   }catch(e){
-    // URL failed → wait for manual upload
-    $('loading').querySelector('p').textContent='Select your portfolio PDF to begin.';
+    $('loading').querySelector('p').textContent='Could not load portfolio.pdf — check the file is in your repo.';
     $('loading').querySelector('.spin').style.display='none';
   }
 }
 
-// ── render a page onto a canvas ────────────────────────────
+async function computeScale(){
+  const pg=await pdf.getPage(1);
+  const vp=pg.getViewport({scale:1});
+  const topH=44;
+  if(isMobile()){
+    // single page — fill screen width with a pixel-density boost
+    const dpr=window.devicePixelRatio||1;
+    const maxW=window.innerWidth*.96;
+    const maxH=(window.innerHeight-topH)*.96;
+    scale=Math.min(maxW/vp.width, maxH/vp.height)*dpr;
+    scale=Math.min(scale,4); // cap at 4× to avoid huge canvases
+  } else {
+    const maxW=(window.innerWidth*.9)/2;
+    const maxH=(window.innerHeight-topH)*.9;
+    scale=Math.min(maxW/vp.width, maxH/vp.height, 2.5);
+  }
+}
+
+// ── render a page onto a canvas ───────────────────────────
 async function renderPage(n,canvas){
-  if(n<1||n>total) return;
+  if(!pdf||n<1||n>total) return;
   const pg=await pdf.getPage(n);
   const vp=pg.getViewport({scale});
   canvas.width=vp.width; canvas.height=vp.height;
+  // on mobile, shrink canvas display size back to fit screen
+  if(isMobile()){
+    const dpr=window.devicePixelRatio||1;
+    canvas.style.width =(vp.width /dpr)+'px';
+    canvas.style.height=(vp.height/dpr)+'px';
+  } else {
+    canvas.style.width=''; canvas.style.height='';
+  }
   await pg.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
 }
 
+// ── render spread (two pages side by side) ────────────────
 async function renderSpread(left,animate,dir){
-  const right=left+1, hasR=right<=total;
+  const right=left+1, hasR=right<=total && !isMobile();
   hR.style.display=hasR?'':'none';
   await renderPage(left,cL);
   if(hasR) await renderPage(right,cR);
-  hL.style.width=cL.width+'px';  hL.style.height=cL.height+'px';
-  if(hasR){hR.style.width=cR.width+'px'; hR.style.height=cR.height+'px';}
-  if(animate && dir) await flipAnimation(left,right,dir);
+
+  const dispW = isMobile() ? parseInt(cL.style.width||cL.width) : cL.width;
+  const dispH = isMobile() ? parseInt(cL.style.height||cL.height) : cL.height;
+  hL.style.width =dispW+'px'; hL.style.height=dispH+'px';
+  if(hasR){ hR.style.width=dispW+'px'; hR.style.height=dispH+'px'; }
+
+  if(animate&&dir) await slideFlip(left,right,dir,dispW,dispH);
   updateUI();
 }
 
 // ──────────────────────────────────────────────────────────
-// FLIP ANIMATION — FlippingBook style
-//
-// NEXT (L→R turn): right page lifts, curls left over the spine,
-//   revealing new left page underneath.
-// PREV (R→L turn): left page lifts, curls right over the spine,
-//   revealing new right page underneath.
-//
-// Technique: We use two canvases (front/back) inside a preserve-3d
-// container. The outer #flipper div clips to the active half.
-// The pivot is the spine (left edge of right half / right edge of left half).
-// rotateY goes 0 → -180 (next) or 0 → +180 (prev).
+// SLIDE-FLIP ANIMATION
+// A clean, smooth page slide — like turning a page on a real book.
+// The new page slides in from the spine edge over ~480ms with
+// an ease-out curve and a thin trailing shadow edge.
 // ──────────────────────────────────────────────────────────
-async function flipAnimation(newLeft, newRight, dir){
+async function slideFlip(newLeft,newRight,dir,pw,ph){
   if(busy) return; busy=true;
 
-  const pw=cL.width, ph=cL.height;
+  // Which page slides in?
+  // next: new left page slides in from right→left across the left half
+  // prev: new right page slides in from left→right across the right half
+  const slidePage = dir==='next' ? newLeft : (newRight<=total?newRight:newLeft);
 
-  // ── What shows on front and back of the turning leaf? ──
-  // For NEXT: front = old right page (being turned away), back = new left page
-  // For PREV: front = old left page (being turned away), back = new right page
-  const oldSpread = dir==='next' ? spread-2 : spread+2;
-  const frontPage = dir==='next' ? oldSpread+1 : oldSpread;
-  const backPage  = dir==='next' ? newLeft     : newRight;
+  // Render the incoming page onto cSlide
+  const realW=cL.width, realH=cL.height;
+  cSlide.width=realW; cSlide.height=realH;
+  cSlide.style.width=pw+'px'; cSlide.style.height=ph+'px';
+  await renderPage(slidePage, cSlide);
 
-  // Render front face
-  await renderPage(Math.max(1,Math.min(total,frontPage)), fcFront);
-  // Render back face (will be seen mirror-flipped)
-  await renderPage(Math.max(1,Math.min(total,backPage)), fcBack);
+  // Position slide-over on top of the correct half
+  slideOver.style.width =pw+'px';
+  slideOver.style.height=ph+'px';
+  slideOver.style.display='block';
+  slideOver.style.overflow='hidden';
+  slideOver.style.borderRadius = dir==='next' ? '3px 0 0 3px' : '0 3px 3px 0';
 
-  // Make both flip canvases the same size as one page
-  [fcFront,fcBack].forEach(c=>{c.width=pw;c.height=ph;});
-  // Re-render now we've set sizes
-  await renderPage(Math.max(1,Math.min(total,frontPage)), fcFront);
-  await renderPage(Math.max(1,Math.min(total,backPage)),  fcBack);
-
-  // ── Position #flipper over the active half ──
-  // For NEXT the leaf starts on the right half and pivots left over spine.
-  // For PREV the leaf starts on the left half and pivots right.
-  flipper.style.width=pw+'px';
-  flipper.style.height=ph+'px';
-  flipper.style.display='block';
+  // The shadow edge sits on the leading edge of the sliding page
+  slideEdge.style.top='0';
+  slideEdge.style.height=ph+'px';
 
   if(dir==='next'){
-    // flipper sits over right half
-    flipper.style.right='0'; flipper.style.left='auto';
-    flipInner.style.perspective='1200px';
-    flipInner.style.perspectiveOrigin='left center';
-    // front pivots from left edge
-    fcFront.style.transformOrigin='left center';
-    fcBack.style.transformOrigin ='left center';
-    // back face default rotateY(180deg) already set in CSS
+    // slide-over on left half
+    slideOver.style.left='0';
+    slideOver.style.right='auto';
+    // page starts off-screen to the right (+pw), slides to 0
+    slideEdge.style.right='0'; slideEdge.style.left='auto';
+    slideEdge.style.background='linear-gradient(to left,rgba(0,0,0,.18),transparent)';
   } else {
-    // flipper sits over left half
-    flipper.style.left='0'; flipper.style.right='auto';
-    flipInner.style.perspective='1200px';
-    flipInner.style.perspectiveOrigin='right center';
-    fcFront.style.transformOrigin='right center';
-    fcBack.style.transformOrigin ='right center';
+    // slide-over on right half
+    slideOver.style.left=pw+'px';
+    slideOver.style.right='auto';
+    slideEdge.style.left='0'; slideEdge.style.right='auto';
+    slideEdge.style.background='linear-gradient(to right,rgba(0,0,0,.18),transparent)';
   }
 
-  // ── Animate ──────────────────────────────────────────────
-  const duration=560; // ms — matches FlippingBook feel
-  const startAngle=0, endAngle= dir==='next' ? -180 : 180;
+  const duration=420;
 
   await tween(duration, t=>{
-    // ease-in-out cubic
-    const e = t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;
-    const angle = endAngle * e;
+    // ease-out quart: fast start, smooth landing
+    const e=1-Math.pow(1-t,4);
+    const offset = dir==='next'
+      ? pw*(1-e)        // moves from +pw → 0
+      : -pw*(1-e);      // moves from -pw → 0
 
-    // Slight page-bow: a gentle Z rotation that peaks at 90°
-    const bow = Math.sin(e*Math.PI) * (dir==='next'?-4:4);
-
-    const tf=`rotateY(${angle}deg) rotateZ(${bow}deg)`;
-    fcFront.style.transform = tf;
-    // back face starts at 180°, so total = 180+angle
-    fcBack.style.transform  = `rotateY(${180+angle}deg) rotateZ(${bow}deg)`;
-
-    // Shadow: strongest at 90°
-    const shadowPeak=Math.sin(e*Math.PI);
-    flipShadow.style.opacity=shadowPeak*.55;
-    flipShadow.style.background= dir==='next'
-      ? `linear-gradient(to right, rgba(0,0,0,${(shadowPeak*.4).toFixed(2)}), transparent 60%)`
-      : `linear-gradient(to left,  rgba(0,0,0,${(shadowPeak*.4).toFixed(2)}), transparent 60%)`;
+    cSlide.style.transform=`translateX(${offset}px)`;
+    slideEdge.style.opacity=(1-e).toFixed(3);
   });
 
-  // ── Teardown ──────────────────────────────────────────────
-  flipper.style.display='none';
-  fcFront.style.transform='';
-  fcBack.style.transform='rotateY(180deg)';
-  flipShadow.style.opacity=0;
+  slideOver.style.display='none';
+  cSlide.style.transform='';
+  slideEdge.style.opacity='0';
   busy=false;
 }
 
@@ -257,18 +251,18 @@ function tween(ms,cb){
     (function loop(now){
       const t=Math.min((now-s)/ms,1);
       cb(t);
-      t<1 ? requestAnimationFrame(loop) : res();
+      t<1?requestAnimationFrame(loop):res();
     })(performance.now());
   });
 }
 
 // ── UI ─────────────────────────────────────────────────────
 function updateUI(){
-  const r=spread+1,hasR=r<=total;
-  const lbl=`${spread}${hasR?'–'+r:''} / ${total}`;
+  const r=spread+1, hasR=r<=total;
+  const lbl=`${spread}${hasR&&!isMobile()?'–'+r:''} / ${total}`;
   $('plbl').textContent=lbl; $('tpg').textContent=lbl;
   $('bPrev').disabled=$('bFirst').disabled=spread<=1;
-  $('bNext').disabled=$('bLast').disabled=spread+1>total;
+  $('bNext').disabled=$('bLast').disabled=(isMobile()?spread>=total:spread+1>=total);
 }
 
 async function go(n,dir){
@@ -277,12 +271,22 @@ async function go(n,dir){
   await renderSpread(spread,true,dir);
 }
 
-$('bNext').onclick =()=>go(Math.min(spread+2,total%2===0?total-1:total),'next');
-$('bPrev').onclick =()=>go(Math.max(spread-2,1),'prev');
+$('bNext').onclick=()=>{
+  const step=isMobile()?1:2;
+  const maxSpread=isMobile()?total:(total%2===0?total-1:total);
+  go(Math.min(spread+step,maxSpread),'next');
+};
+$('bPrev').onclick=()=>{
+  const step=isMobile()?1:2;
+  go(Math.max(spread-step,1),'prev');
+};
 $('bFirst').onclick=()=>go(1,'prev');
-$('bLast').onclick =()=>go(total%2===0?total-1:total,'next');
-$('bZi').onclick   =async()=>{scale=Math.min(scale*1.2,3);  if(pdf)await renderSpread(spread,false)};
-$('bZo').onclick   =async()=>{scale=Math.max(scale/1.2,.3); if(pdf)await renderSpread(spread,false)};
+$('bLast').onclick=()=>{
+  const last=isMobile()?total:(total%2===0?total-1:total);
+  go(last,'next');
+};
+$('bZi').onclick=async()=>{scale=Math.min(scale*1.2,5); if(pdf)await renderSpread(spread,false)};
+$('bZo').onclick=async()=>{scale=Math.max(scale/1.2,.3); if(pdf)await renderSpread(spread,false)};
 
 document.addEventListener('keydown',e=>{
   if(!pdf)return;
@@ -290,23 +294,28 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft' ||e.key==='ArrowUp')   $('bPrev').click();
 });
 
-// ── drag & drop ────────────────────────────────────────────
-document.addEventListener('dragover',e=>e.preventDefault());
-document.addEventListener('drop',async e=>{
-  e.preventDefault();
-  const f=e.dataTransfer.files[0];
-  if(f&&f.type==='application/pdf'){
-    const ab=await f.arrayBuffer();
-    loadPDF({data:new Uint8Array(ab)});
-  }
-});
-$('fi').onchange=async e=>{
-  const f=e.target.files[0]; if(!f)return;
-  const ab=await f.arrayBuffer();
-  loadPDF({data:new Uint8Array(ab)});
-};
+// touch swipe
+let tx0=null;
+document.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(tx0===null||!pdf)return;
+  const dx=e.changedTouches[0].clientX-tx0;
+  if(Math.abs(dx)>50){ dx<0?$('bNext').click():$('bPrev').click(); }
+  tx0=null;
+},{passive:true});
 
-// ── auto-load from GitHub Pages PDF_URL ────────────────────
+// re-render on resize
+let resizeTimer;
+window.addEventListener('resize',()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(async()=>{
+    if(!pdf)return;
+    await computeScale();
+    await renderSpread(spread,false);
+  },200);
+});
+
+// ── auto-load ──────────────────────────────────────────────
 loadPDF(PDF_URL);
 </script>
 </body>
